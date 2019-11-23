@@ -11,7 +11,7 @@
 
 int main(){
 
-	int sockfd, ret;
+	int sockfd, ret, i;
 	struct sockaddr_in serverAddr;
 	int newSocket;
 	struct sockaddr_in newAddr;
@@ -20,7 +20,7 @@ int main(){
 	pid_t childpid;
 	mesure *m=NULL;
 	m = (mesure*)malloc(sizeof(mesure)); 
-
+	i=0;
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(sockfd < 0){
 		printf("[-]Error in connection.\n");
@@ -53,7 +53,7 @@ int main(){
 			exit(1);
 		}
 		printf("Connection accepted from %s:%d\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
-
+		printf("Mesure n° %d\n", i);
 		if((childpid = fork()) == 0){
 			close(sockfd);
 
@@ -64,15 +64,18 @@ int main(){
 						printf("Disconnected from %s:%d\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
 						break;
 					}else{
-						//printf("Client n° %d: %s\n",childpid, buffer);
-						m->id=atoi(strtok(buffer, ";"));
-						m->temp=atoi(strtok(NULL,";"));
-						m->hum=atoi(strtok(NULL,";"));
-						printf("Device ID : %d\nTemperature : %d\nHumidity : %d\n", m->id, m->temp, m->hum);
+						
+						
+						(m+i)->id=atoi(strtok(buffer, ";"));
+						(m+i)->temp=atoi(strtok(NULL,";"));
+						(m+i)->hum=atoi(strtok(NULL,";"));
+						m = realloc(m,(sizeof(m))+sizeof(mesure));
+						printf("Device ID : %d\nTemperature : %d\nHumidity : %d\n", m[i].id, m[i].temp, m[i].hum);
 						send(newSocket, "OK\r", 3, 0);
 						//sleep(4);
 						bzero(buffer, sizeof(buffer));
-				}
+						i++;
+					}
 				}
 				
 			}
