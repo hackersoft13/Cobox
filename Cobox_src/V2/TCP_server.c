@@ -6,21 +6,20 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
+#include "TCPserver.h"
 #define PORT 4444
 
 int main(){
 
 	int sockfd, ret;
-	 struct sockaddr_in serverAddr;
-
+	struct sockaddr_in serverAddr;
 	int newSocket;
 	struct sockaddr_in newAddr;
-
 	socklen_t addr_size;
-
 	char buffer[1024];
 	pid_t childpid;
+	mesure *m=NULL;
+	m = (mesure*)malloc(sizeof(mesure)); 
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(sockfd < 0){
@@ -60,14 +59,22 @@ int main(){
 
 			while(1){
 				recv(newSocket, buffer, 1024, 0);
-				if(strcmp(buffer, ":exit") == 0){
-					printf("Disconnected from %s:%d\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
-					break;
-				}else{
-					printf("Client n° %d: %s\n",childpid, buffer);
-					send(newSocket, buffer, strlen(buffer), 0);
-					bzero(buffer, sizeof(buffer));
+				if (strlen(buffer) > 3){
+					if(strcmp(buffer, ":exit") == 0){
+						printf("Disconnected from %s:%d\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
+						break;
+					}else{
+						//printf("Client n° %d: %s\n",childpid, buffer);
+						m->id=atoi(strtok(buffer, ";"));
+						m->temp=atoi(strtok(NULL,";"));
+						m->hum=atoi(strtok(NULL,";"));
+						printf("Device ID : %d\nTemperature : %d\nHumidity : %d\n", m->id, m->temp, m->hum);
+						send(newSocket, "OK\r", 3, 0);
+						//sleep(4);
+						bzero(buffer, sizeof(buffer));
 				}
+				}
+				
 			}
 		}
 
