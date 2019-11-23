@@ -85,7 +85,7 @@ int initSocket(struct sockaddr_in * adresse) {
 		printf("Echéc de la mise en écoute: %s\n", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
-	// Passage en mode non bloquant
+	// Passage en mode non bloquant, on va écouter ce qu'il se passe
 	fcntl(fdsocket, F_SETFL, O_NONBLOCK);
 	printf("Mise en écoute de la socket\n");
 	return fdsocket;
