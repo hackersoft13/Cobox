@@ -44,8 +44,11 @@ int main(void) {
 		if ((clientSocket = waitForClient(&serverSocket)) != -1) {
 			// On ajoute le nouveau client au tableau des descripteurs
 			addClientToTab(clientSocket, clients);
+			
 		}
 		manageClient(clients);
+		printf("Je sleep...\n");
+		sleep(1);
 	}
 	return EXIT_SUCCESS;
 }
