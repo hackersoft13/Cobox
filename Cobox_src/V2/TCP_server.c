@@ -87,7 +87,7 @@ int main(){
 			//exit(0);
 		} else 
 		{
-			pid_t cpid = wait(NULL);
+			wait(NULL);
 		}
 		
 		i++;
