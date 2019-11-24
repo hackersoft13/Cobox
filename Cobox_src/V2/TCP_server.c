@@ -71,7 +71,7 @@ int main(){
 						(m+i)->hum=atoi(strtok(NULL,";"));
 						m = realloc(m,(sizeof(m))+sizeof(mesure));
 						printf("Device ID : %d\nTemperature : %d\nHumidity : %d\n", m[i].id, m[i].temp, m[i].hum);
-						send(newSocket, "OK\r", 3, 0);
+						send(newSocket, "1;1;1\r", 10, 0);
 						//sleep(4);
 						bzero(buffer, sizeof(buffer));
 						i++;
@@ -80,6 +80,7 @@ int main(){
 				
 			}
 		}
+		i++;
 
 	}
 
