@@ -6,6 +6,8 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <signal.h>
+#include<sys/wait.h> 
 #include "TCPserver.h"
 #define PORT 4444
 
@@ -54,7 +56,8 @@ int main(){
 		}
 		printf("Connection accepted from %s:%d\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
 		printf("Mesure n° %d\n", i);
-		if((childpid = fork()) == 0){
+		childpid = fork();
+		if(childpid == 0){
 			close(sockfd);
 
 			while(1){
@@ -62,6 +65,7 @@ int main(){
 				if (strlen(buffer) > 3){
 					if(strcmp(buffer, ":exit") == 0){
 						printf("Disconnected from %s:%d\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
+						exit(0);
 						break;
 					}else{
 						
@@ -79,11 +83,19 @@ int main(){
 				}
 				
 			}
+			//
+			//exit(0);
+		} else 
+		{
+			pid_t cpid = wait(NULL);
 		}
+		
 		i++;
 
-	}
+		
 
+	}
+	
 	close(newSocket);
 
 
