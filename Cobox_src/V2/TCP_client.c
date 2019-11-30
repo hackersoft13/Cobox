@@ -48,7 +48,7 @@ int main(){
 		if(recv(clientSocket, buffer, 1024, 0) < 0){
 			printf("[-]Error in receiving data.\n");
 		}else{
-			printf("Server: \t%s\n", buffer);
+			printf("Server: %s\n", buffer);
 		}
 	}
 

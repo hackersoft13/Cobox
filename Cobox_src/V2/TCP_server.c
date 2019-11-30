@@ -6,12 +6,17 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <signal.h>
+#include<sys/wait.h> 
+#include <fcntl.h>
+#include <sys/stat.h>
 #include "TCPserver.h"
 #define PORT 4444
 
 int main(){
-
-	int sockfd, ret;
+	int fd;
+	mkfifo("fifo", 0666);
+	int sockfd, ret, i;
 	struct sockaddr_in serverAddr;
 	int newSocket;
 	struct sockaddr_in newAddr;
@@ -20,7 +25,7 @@ int main(){
 	pid_t childpid;
 	mesure *m=NULL;
 	m = (mesure*)malloc(sizeof(mesure)); 
-
+	i=0;
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(sockfd < 0){
 		printf("[-]Error in connection.\n");
@@ -53,8 +58,9 @@ int main(){
 			exit(1);
 		}
 		printf("Connection accepted from %s:%d\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
-
-		if((childpid = fork()) == 0){
+		printf("Mesure n° %d\n", i);
+		childpid = fork();
+		if(childpid == 0){
 			close(sockfd);
 
 			while(1){
@@ -62,24 +68,45 @@ int main(){
 				if (strlen(buffer) > 3){
 					if(strcmp(buffer, ":exit") == 0){
 						printf("Disconnected from %s:%d\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
+						exit(0);
 						break;
 					}else{
-						//printf("Client n° %d: %s\n",childpid, buffer);
-						m->id=atoi(strtok(buffer, ";"));
-						m->temp=atoi(strtok(NULL,";"));
-						m->hum=atoi(strtok(NULL,";"));
-						printf("Device ID : %d\nTemperature : %d\nHumidity : %d\n", m->id, m->temp, m->hum);
-						send(newSocket, "OK\r", 3, 0);
+						
+						printf("Ouverture FIFO\n");
+
+						fd=open("fifo", O_RDWR);
+						write(fd, "COUCOU\n", (strlen("COUCOU\n")+1));
+						(m+i)->id=atoi(strtok(buffer, ";"));
+						(m+i)->temp=atoi(strtok(NULL,";"));
+						(m+i)->hum=atoi(strtok(NULL,";"));
+						m = realloc(m,(sizeof(m))+sizeof(mesure));
+						printf("Device ID : %d\nTemperature : %d\nHumidity : %d\n", m[i].id, m[i].temp, m[i].hum);
+						send(newSocket, "1;1;1\r", 10, 0);
 						//sleep(4);
 						bzero(buffer, sizeof(buffer));
-				}
+						close (fd);
+						i++;
+					}
 				}
 				
 			}
+			//
+			//exit(0);
+		} else 
+		{
+			char tst[50];
+			pid_t cpid = wait(NULL);
+			fd = open("fifo", O_RDONLY | O_NONBLOCK);
+			read(fd, tst, (strlen("COUCOU\n")+1));
+			printf("%s",tst);
 		}
+		
+		i++;
+
+		
 
 	}
-
+	
 	close(newSocket);
 
 

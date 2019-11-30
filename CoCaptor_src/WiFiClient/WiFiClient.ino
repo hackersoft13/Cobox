@@ -8,16 +8,15 @@
 #include <ESP8266WiFiMulti.h>
 
 #ifndef STASSID
-#define STASSID "Pauliphone"
-#define STAPSK  "Maisquelbogoss"
+#define STASSID "Ominux"
+#define STAPSK  "vr5d7tEW"
 #endif
 
 const char* ssid     = STASSID;
 const char* password = STAPSK;
 
-const char* host = "192.168.43.123";
+const char* host = "10.42.0.1";
 const uint16_t port = 4444;
-
 ESP8266WiFiMulti WiFiMulti;
 
 void setup() {
@@ -62,12 +61,27 @@ void loop() {
   }
 
   // This will send the request to the server
-  client.println("hello from ESP8266");
-
+  client.println("2;23;56\r");
+  delay(5000);
   //read back one line from server
-  //Serial.println("receiving from remote server");
+  Serial.println("receiving from remote server");
   String line = client.readStringUntil('\r');
-  //Serial.println(line);
+  String temp = line.substring(0,1);
+  int type = temp.toInt();
+  temp = line.substring(2,3);
+  int id_device = temp.toInt();
+  temp = line.substring(4,5);
+  int order = temp.toInt();
+  
+  Serial.println(line);
+  Serial.print("Type : ");
+  Serial.print(type);
+  Serial.print(" Devide id : ");
+  Serial.print(id_device);
+  Serial.print(" Order : ");
+  Serial.println(order);
+  
+  
   client.println(":exit");
 
   Serial.println("closing connection");
