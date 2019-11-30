@@ -14,4 +14,4 @@ TCP_client.o:
 
 
 clean:
-	rm *.o Cobox_Server Cobox_Client fifo
+	rm *.o Cobox_Server Cobox_Client 
