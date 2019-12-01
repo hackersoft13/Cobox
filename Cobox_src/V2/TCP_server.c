@@ -9,13 +9,17 @@
 #include <signal.h>
 #include<sys/wait.h> 
 #include <fcntl.h>
-#include <sys/stat.h>
+
+
+#include <sys/ipc.h> 
+#include <sys/shm.h> 
 #include "TCPserver.h"
+
 #define PORT 4444
 
 int main(){
-	int fd;
-	mkfifo("fifo", 0666);
+	key_t key = ftok("shmfile",65);
+	int shmid = shmget(key,1024,0666|IPC_CREAT); 
 	int sockfd, ret, i;
 	struct sockaddr_in serverAddr;
 	int newSocket;
@@ -72,19 +76,20 @@ int main(){
 						break;
 					}else{
 						
-						printf("Ouverture FIFO\n");
+						char tst[10];
+						strcpy(tst,buffer);
+						//printf("Copy OK\n");
+						
 
-						fd=open("fifo", O_RDWR);
-						write(fd, "COUCOU\n", (strlen("COUCOU\n")+1));
-						(m+i)->id=atoi(strtok(buffer, ";"));
-						(m+i)->temp=atoi(strtok(NULL,";"));
-						(m+i)->hum=atoi(strtok(NULL,";"));
-						m = realloc(m,(sizeof(m))+sizeof(mesure));
-						printf("Device ID : %d\nTemperature : %d\nHumidity : %d\n", m[i].id, m[i].temp, m[i].hum);
+						//printf("Device ID : %d\nTemperature : %d\nHumidity : %d\n", m[i].id, m[i].temp, m[i].hum);
 						send(newSocket, "1;1;1\r", 10, 0);
-						//sleep(4);
+						char *str = (char*) shmat(shmid,(void*)0,0); 
+						//printf("Attach OK OK\n");
+						strcpy(str,tst);
+						printf("Ecriture du process %d dans la mémoire\n",getpid());
+						shmdt(str);
 						bzero(buffer, sizeof(buffer));
-						close (fd);
+						
 						i++;
 					}
 				}
@@ -94,11 +99,15 @@ int main(){
 			//exit(0);
 		} else 
 		{
-			char tst[50];
-			pid_t cpid = wait(NULL);
-			fd = open("fifo", O_RDONLY | O_NONBLOCK);
-			read(fd, tst, (strlen("COUCOU\n")+1));
-			printf("%s",tst);
+			wait(NULL);
+			int hum,temp,id_device;
+			char *str = (char*) shmat(shmid,(void*)0,0);
+			id_device=atoi(strtok(str,";"));
+			temp=atoi(strtok(NULL,";"));
+			hum=atoi(strtok(NULL,";"));
+			printf("ID : %d || Temp : %d || Hum : %d\n",id_device,temp,hum); 
+			shmdt(str); 
+
 		}
 		
 		i++;
@@ -108,6 +117,7 @@ int main(){
 	}
 	
 	close(newSocket);
+	shmctl(shmid,IPC_RMID,NULL); 
 
 
 	return 0;
