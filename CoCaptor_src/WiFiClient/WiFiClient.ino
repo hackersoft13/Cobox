@@ -8,14 +8,14 @@
 #include <ESP8266WiFiMulti.h>
 
 #ifndef STASSID
-#define STASSID "Ominux"
-#define STAPSK  "vr5d7tEW"
+#define STASSID "chhhh"
+#define STAPSK  "chhhh"
 #endif
 
 const char* ssid     = STASSID;
 const char* password = STAPSK;
 
-const char* host = "10.42.0.1";
+const char* host = "192.168.2.20";
 const uint16_t port = 4444;
 ESP8266WiFiMulti WiFiMulti;
 
@@ -61,7 +61,7 @@ void loop() {
   }
 
   // This will send the request to the server
-  client.println("2;23;56\r");
+  client.println("4;25;69\r");
   delay(5000);
   //read back one line from server
   Serial.println("receiving from remote server");
