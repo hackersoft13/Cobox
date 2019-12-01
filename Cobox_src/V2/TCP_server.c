@@ -90,10 +90,10 @@ int main(){
 						shmdt(str);
 						bzero(buffer, sizeof(buffer));
 						
-						i++;
+						
 					}
 				}
-				
+				i++;
 			}
 			//
 			//exit(0);
