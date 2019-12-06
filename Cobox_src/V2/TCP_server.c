@@ -30,6 +30,9 @@ int main(){
 	mesure *m=NULL;
 	m = (mesure*)malloc(sizeof(mesure)); 
 	i=0;
+
+
+
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(sockfd < 0){
 		printf("[-]Error in connection.\n");
@@ -100,12 +103,13 @@ int main(){
 		} else 
 		{
 			wait(NULL);
-			int hum,temp,id_device;
+			int id_device;
+			double hum,temp;
 			char *str = (char*) shmat(shmid,(void*)0,0);
 			id_device=atoi(strtok(str,";"));
-			temp=atoi(strtok(NULL,";"));
-			hum=atoi(strtok(NULL,";"));
-			printf("ID : %d || Temp : %d || Hum : %d\n",id_device,temp,hum); 
+			temp=atof(strtok(NULL,";"));
+			hum=atof(strtok(NULL,";"));
+			printf("ID : %d || Temp : %f || Hum : %f\n",id_device,temp,hum); 
 			shmdt(str); 
 
 		}
