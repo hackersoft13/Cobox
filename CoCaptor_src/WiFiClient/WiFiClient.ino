@@ -70,6 +70,7 @@ void loop() {
   
   // This will send the request to the server
   client.println((String)"2;"+t+";"+h+"\r");
+
   delay(5000);
   //read back one line from server
   Serial.println("receiving from remote server");
