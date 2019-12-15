@@ -8,9 +8,11 @@
 #include <ESP8266WiFiMulti.h>
 
 #ifndef STASSID
-#define STASSID "chhhh"
-#define STAPSK  "chhhh"
+#define STASSID "chut"
+#define STAPSK  "chut"
 #endif
+#include "DHTesp.h"
+DHTesp dht;
 
 const char* ssid     = STASSID;
 const char* password = STAPSK;
@@ -21,7 +23,7 @@ ESP8266WiFiMulti WiFiMulti;
 
 void setup() {
   Serial.begin(115200);
-
+  dht.setup(4, DHTesp::DHT22);
   // We start by connecting to a WiFi network
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP(ssid, password);
@@ -59,9 +61,16 @@ void loop() {
     delay(5000);
     return;
   }
-
+  float h = dht.getHumidity();
+  float t = dht.getTemperature();
+  Serial.println("temp : ");
+  Serial.print(t);
+  Serial.println("hum : ");
+  Serial.print(h);
+  
   // This will send the request to the server
-  client.println("4;25;69\r");
+  client.println((String)"2;"+t+";"+h+"\r");
+
   delay(5000);
   //read back one line from server
   Serial.println("receiving from remote server");

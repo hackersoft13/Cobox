@@ -12,7 +12,8 @@
 // Contenu du .h
  
 typedef struct mesure {
-    int id, temp, hum;
+    int id;
+    double temp, hum;
     char timestamp[50];
 }mesure; 
 #endif
