@@ -13,6 +13,8 @@
 #include <sys/shm.h> 
 #include <mysql/mysql.h>
 
+#include <time.h>
+
 #include "TCPserver.h"
 
 #define PORT 4444
@@ -29,7 +31,7 @@ int main(){
 	pid_t childpid;
 	mesure *m=NULL;
 	m = (mesure*)malloc(sizeof(mesure)); 
-	i=0;
+	i=1;
 	
 	MYSQL *conn;
 	MYSQL_RES *res;
@@ -39,27 +41,10 @@ int main(){
 	char *user = "coco";
 	char *password = "coco_pass"; /* set me first */
 	char *database = "cobox_data";
-	conn = mysql_init(NULL);
-	printf("Ouverture de la base de données...\n");
-	if (!mysql_real_connect(conn, server, user, password, database, 0, NULL, 0)) {
-		fprintf(stderr, "%s\n", mysql_error(conn));
-		exit(1);
-	}
-	if (mysql_query(conn, "show tables")) {
-		fprintf(stderr, "%s\n", mysql_error(conn));
-		exit(1);
-	}
-	res = mysql_use_result(conn);
 	
-	/* output table name */
-	printf("MySQL Tables in mysql database:\n");
-   
-	while ((row = mysql_fetch_row(res)) != NULL){
-		printf("%s \n", row[0]);
-	}
-
-
-
+	
+	
+	
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(sockfd < 0){
@@ -131,14 +116,42 @@ int main(){
 		} else 
 		{
 			wait(NULL);
-			int id_device;
+			int id_device,timestamp;
 			double hum,temp;
 			char *str = (char*) shmat(shmid,(void*)0,0);
+			char req[255];
 			id_device=atoi(strtok(str,";"));
 			temp=atof(strtok(NULL,";"));
 			hum=atof(strtok(NULL,";"));
+			timestamp=(int)time(NULL);
 			printf("ID : %d || Temp : %f || Hum : %f\n",id_device,temp,hum); 
 			shmdt(str); 
+			conn = mysql_init(NULL);
+			printf("Ouverture de la base de données...\n");
+			if (!mysql_real_connect(conn, server, user, password, database, 0, NULL, 0)) {
+				fprintf(stderr, "%s\n", mysql_error(conn));
+				exit(1);
+			}else{
+				printf("Ouverture OK\n");
+			}
+			//req=strcat("INSERT INTO mesure VALUES ('",i);
+			//-----------Préparation de la requete SQL....
+
+			sprintf(req,"INSERT INTO mesures (id, id_device, temp, hum, timestamp) VALUES(%d,%d,%f,%f,%d)",i, id_device, temp, hum, timestamp);
+
+			if (mysql_query(conn, req)) {
+				fprintf(stderr, "%s\n", mysql_error(conn));
+				exit(1);
+			}else
+			{
+				printf("Insertion OK\n");
+			}
+			
+			res = mysql_use_result(conn);
+			mysql_free_result(res);
+			printf("Fermeture BDD.\n");
+			mysql_close(conn);
+			
 
 		}
 		
