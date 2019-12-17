@@ -9,12 +9,12 @@
 #include <signal.h>
 #include<sys/wait.h> 
 #include <fcntl.h>
-
-
 #include <sys/ipc.h> 
 #include <sys/shm.h> 
+#include <mysql/mysql.h>
+#include <time.h>
 #include "TCPserver.h"
-
+#include "extension.h"
 #define PORT 4444
 
 int main(){
@@ -29,9 +29,22 @@ int main(){
 	pid_t childpid;
 	mesure *m=NULL;
 	m = (mesure*)malloc(sizeof(mesure)); 
-	i=0;
-
-
+	i=1;
+	
+	MYSQL *conn;
+	MYSQL_RES *res;
+	MYSQL_ROW row;
+	
+	char *server = "localhost";
+	char *user = "coco";
+	char *password = "coco_pass"; /* set me first */
+	char *database = "cobox_data";
+	
+	int previous_id;
+	previous_id = recup_current_id(server, user, password, database);
+	i = previous_id + 1;
+	printf("Last ID was : %d. New ID is : %d \n", previous_id, i);
+	
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(sockfd < 0){
@@ -103,14 +116,42 @@ int main(){
 		} else 
 		{
 			wait(NULL);
-			int id_device;
+			int id_device,timestamp;
 			double hum,temp;
 			char *str = (char*) shmat(shmid,(void*)0,0);
+			char req[255];
 			id_device=atoi(strtok(str,";"));
 			temp=atof(strtok(NULL,";"));
 			hum=atof(strtok(NULL,";"));
+			timestamp=(int)time(NULL);
 			printf("ID : %d || Temp : %f || Hum : %f\n",id_device,temp,hum); 
 			shmdt(str); 
+			conn = mysql_init(NULL);
+			printf("Ouverture de la base de données...\n");
+			if (!mysql_real_connect(conn, server, user, password, database, 0, NULL, 0)) {
+				fprintf(stderr, "%s\n", mysql_error(conn));
+				exit(1);
+			}else{
+				printf("Ouverture OK\n");
+			}
+
+			//-----------Préparation de la requete SQL....
+
+			sprintf(req,"INSERT INTO mesures (id, id_device, temp, hum, timestamp) VALUES(%d,%d,%f,%f,%d)",i, id_device, temp, hum, timestamp);
+
+			if (mysql_query(conn, req)) {
+				fprintf(stderr, "%s\n", mysql_error(conn));
+				exit(1);
+			}else
+			{
+				printf("Insertion OK\n");
+			}
+			
+			res = mysql_use_result(conn);
+			mysql_free_result(res);
+			printf("Fermeture BDD.\n");
+			mysql_close(conn);
+			
 
 		}
 		
