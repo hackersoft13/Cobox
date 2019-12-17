@@ -90,17 +90,12 @@ int main(){
 						printf("Disconnected from %s:%d\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
 						exit(0);
 						break;
-					}else{
+					}else{ // Le fils
 						
 						char tst[10];
 						strcpy(tst,buffer);
-						//printf("Copy OK\n");
-						
-
-						//printf("Device ID : %d\nTemperature : %d\nHumidity : %d\n", m[i].id, m[i].temp, m[i].hum);
 						send(newSocket, "1;1;1\r", 10, 0);
 						char *str = (char*) shmat(shmid,(void*)0,0); 
-						//printf("Attach OK OK\n");
 						strcpy(str,tst);
 						printf("Ecriture du process %d dans la mémoire\n",getpid());
 						shmdt(str);
