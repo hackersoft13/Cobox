@@ -12,11 +12,9 @@
 #include <sys/ipc.h> 
 #include <sys/shm.h> 
 #include <mysql/mysql.h>
-
 #include <time.h>
-
 #include "TCPserver.h"
-
+#include "extension.h"
 #define PORT 4444
 
 int main(){
@@ -42,8 +40,10 @@ int main(){
 	char *password = "coco_pass"; /* set me first */
 	char *database = "cobox_data";
 	
-	
-	
+	int previous_id;
+	previous_id = recup_current_id(server, user, password, database);
+	i = previous_id + 1;
+	printf("Last ID was : %d. New ID is : %d \n", previous_id, i);
 	
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -134,7 +134,7 @@ int main(){
 			}else{
 				printf("Ouverture OK\n");
 			}
-			//req=strcat("INSERT INTO mesure VALUES ('",i);
+
 			//-----------Préparation de la requete SQL....
 
 			sprintf(req,"INSERT INTO mesures (id, id_device, temp, hum, timestamp) VALUES(%d,%d,%f,%f,%d)",i, id_device, temp, hum, timestamp);
