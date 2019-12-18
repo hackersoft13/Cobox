@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#include <mysql/mysql.h>
+#include <time.h>
+#include "TCPserver.h"
 #ifndef EXTENSION_H
 #define EXTENSION_H
  
