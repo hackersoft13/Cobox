@@ -94,11 +94,13 @@ int main(){
 						
 						char tst[10];
 						strcpy(tst,buffer);
-						send(newSocket, "1;1;1\r", 10, 0);
 						char *str = (char*) shmat(shmid,(void*)0,0); 
 						strcpy(str,tst);
 						printf("Ecriture du process %d dans la mémoire\n",getpid());
 						shmdt(str);
+						int witw = atoi(strtok(tst,";"));
+						printf("I talk with device n° %d\n", witw);
+						send(newSocket, "1;1;1\r", 10, 0);
 						bzero(buffer, sizeof(buffer));
 						
 						
