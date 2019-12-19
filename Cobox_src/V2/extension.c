@@ -48,10 +48,11 @@ int recup_current_id(char *server, char *user, char *password, char *database){
 
 int decide(double temp, double consigne){
 	//Décide d'inscrire l'ordre à donner en fonctoin d'une consigne
-	int ordre;
+	int ordre, etat;
+	//etat = select_bdd("SELECT * WHERE id_device=")
 	if (temp < consigne){
 		//Tolérance de 4°
-		if (temp < consigne-4){
+		if ((temp < consigne-4)){
 			ordre = 1;
 		}else if (temp < consigne -1){
 			ordre = 0;
@@ -61,13 +62,17 @@ int decide(double temp, double consigne){
 	return ordre;
 }
 
-int apply_order(int id_to_order, char *server, char *user, char *password, char *database){
+int select_bdd(char *req){
 	//Applique l'ordre (si il y en à un) à l'actionneur
 	//Si l'actionneur n'a pas d'ordre en attente, on vérifie si il ne doit pas arreter un précédent ordre
 	MYSQL *conn;
 	MYSQL_RES *res;
 	MYSQL_ROW row;
-    char req[255];
+	char *server = "localhost";
+	char *user = "coco";
+	char *password = "coco_pass"; /* set me first */
+	char *database = "cobox_data";
+    //char req[255];
     int ordre, intern_device;
     conn = mysql_init(NULL);
     //printf("Ouverture de la base de données...\n");
@@ -77,7 +82,7 @@ int apply_order(int id_to_order, char *server, char *user, char *password, char 
 	}else{
 		//printf("Ouverture OK\n");
 	}
-    sprintf(req,"SELECT order FROM ordres WHERE id_device=%d;",id_to_order);
+    //sprintf(req,requete);
 
 	if (mysql_query(conn, req)) {
 		fprintf(stderr, "%s\n", mysql_error(conn));
