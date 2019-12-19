@@ -46,9 +46,19 @@ int recup_current_id(char *server, char *user, char *password, char *database){
     return id_recup;
 }
 
-int decide(float temp, float consigne){
+int decide(double temp, double consigne){
 	//Décide d'inscrire l'ordre à donner en fonctoin d'une consigne
+	int ordre;
+	if (temp < consigne){
+		//Tolérance de 4°
+		if (temp < consigne-4){
+			ordre = 1;
+		}else if (temp < consigne -1){
+			ordre = 0;
+		}
 
+	}//sinon, on laisse tel quel.
+	return ordre;
 }
 
 int apply_order(int id_to_order, char *server, char *user, char *password, char *database){

@@ -91,7 +91,7 @@ int main(){
 						exit(0);
 						break;
 					}else{ // Le fils
-						
+						int new_order;
 						char tst[10];
 						strcpy(tst,buffer);
 						char *str = (char*) shmat(shmid,(void*)0,0); 
@@ -99,7 +99,10 @@ int main(){
 						printf("Ecriture du process %d dans la mémoire\n",getpid());
 						shmdt(str);
 						int witw = atoi(strtok(tst,";"));
-						printf("I talk with device n° %d\n", witw);
+						double witt = atof(strtok(NULL, ";"));
+						printf("I talk with device n° %d, he says temp is %f\n", witw, witt);
+						new_order=decide(witt, 25);
+						printf("Le conseil à décidé de l'ordre %d\n", new_order);
 						send(newSocket, "1;1;1\r", 10, 0);
 						bzero(buffer, sizeof(buffer));
 						
