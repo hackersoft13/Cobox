@@ -1,3 +1,4 @@
-CREATE USER 'cobox'@'localhost' IDENTIFIED BY 'cobox_pass';
-GRANT ALL PRIVILEGES ON * . * TO 'cobox'@'localhost';
+CREATE USER 'coco'@'localhost' IDENTIFIED BY 'coco_pass';
+GRANT ALL PRIVILEGES ON * . * TO 'coco'@'localhost';
+FLUSH PRIVILEGES;
 
