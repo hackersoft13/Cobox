@@ -8,8 +8,8 @@
 #include <ESP8266WiFiMulti.h>
 
 #ifndef STASSID
-#define STASSID "chut"
-#define STAPSK  "chut"
+#define STASSID "COBOX"
+#define STAPSK  "cobox_pass"
 #endif
 #include "DHTesp.h"
 DHTesp dht;
@@ -17,7 +17,7 @@ DHTesp dht;
 const char* ssid     = STASSID;
 const char* password = STAPSK;
 
-const char* host = "192.168.2.20";
+const char* host = "192.168.9.1";
 const uint16_t port = 4444;
 ESP8266WiFiMulti WiFiMulti;
 
@@ -69,7 +69,7 @@ void loop() {
   Serial.print(h);
   
   // This will send the request to the server
-  client.println((String)"2;"+t+";"+h+"\r");
+  client.println((String)"1;"+t+";"+h+"\r");
 
   delay(5000);
   //read back one line from server
