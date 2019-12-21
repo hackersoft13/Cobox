@@ -10,4 +10,6 @@
 // Contenu du .h
  
 int recup_current_id(char *server, char *user, char *password, char *database);
+int decide(double temp, double consigne);
+int select_bdd(char req);
 #endif
